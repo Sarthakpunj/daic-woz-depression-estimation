@@ -1,0 +1,24 @@
+{
+  "audio_encoder_mb": 377.5,
+  "size_mb": {
+    "float32": 438.9,
+    "int8": 181.5,
+    "reduction_pct": 58.6
+  },
+  "latency_ms": {
+    "float32": 36.8,
+    "int8": 36.9,
+    "speedup": 1.0
+  },
+  "accuracy": {
+    "float32": {
+      "mae": 4.241,
+      "r2": 0.315
+    },
+    "int8": {
+      "mae": 4.094,
+      "r2": 0.226
+    },
+    "mae_delta": -0.147
+  }
+}

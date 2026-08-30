@@ -1,0 +1,15 @@
+# Python cache & OS files
+__pycache__/
+*.pyc
+.DS_Store
+
+# DAIC-WOZ Clinical Data & Feature Files (Strict EULA requirement)
+data/
+*.csv
+*.txt
+*.parquet
+
+# Model Binaries
+*.joblib
+*.pt
+*.bin

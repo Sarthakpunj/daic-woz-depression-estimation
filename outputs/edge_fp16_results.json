@@ -1,0 +1,41 @@
+{
+  "method": "fp16 half-precision (int8 rejected: qnnpack embedding cosine ~0.7)",
+  "audio_encoder_mb": 377.5,
+  "size_mb": {
+    "float32": 438.9,
+    "fp16": 220.0,
+    "reduction_pct": 50.0
+  },
+  "latency_ms_chunk_cpu": {
+    "note": "comparable; fp16 emulated on CPU, ~40-50ms both"
+  },
+  "accuracy": {
+    "float32": {
+      "mae": 4.241,
+      "r2": 0.315
+    },
+    "fp16_raw": {
+      "mae": 4.524,
+      "r2": 0.196
+    },
+    "fp16_offset_corrected": {
+      "mae": 4.243,
+      "r2": 0.322
+    },
+    "systematic_offset": -2.351,
+    "prediction_corr": 0.9988,
+    "mean_abs_diff": 2.351
+  },
+  "fairness": {
+    "group0": {
+      "n": 24,
+      "f32": 3.272,
+      "fp16": 3.887
+    },
+    "group1": {
+      "n": 23,
+      "f32": 5.251,
+      "fp16": 5.188
+    }
+  }
+}
