@@ -6,7 +6,7 @@ pipeline to estimate continuous PHQ-8 scores on the DAIC-WOZ corpus, evaluating 
 audio-visual features, deep audio representations (Wav2Vec2, WavLM), text (MPNet), and
 multimodal fusion under a single identical protocol.
 
-**Author:** Sarthak Punj (25133018) · **Supervisor:** Tigmanshu Bhatnagar · COMP0190, UCL
+**Author:** Sarthak Punj (25133018) · **Supervisor:** Tigmanshu Bhatnagar · COMP0191, UCL
 
 ## Key Findings
 
