@@ -132,11 +132,6 @@ Secondary analysis of an existing, ethically collected, licensed dataset; no new
 human-subjects data collection. The model is **research-grade, not a clinical instrument**.
 See the dissertation's ethics section for full discussion.
 
-## Citation
-
-Punj, S. (2026). *Automatic Estimation of Depression Severity from Clinical Interviews.*
-MSc dissertation, University College London.
-
 ## License
 
 Code released for academic review. DAIC-WOZ data is governed by its own licence and is not
