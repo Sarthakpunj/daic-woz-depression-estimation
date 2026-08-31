@@ -28,36 +28,51 @@ multimodal fusion under a single identical protocol.
 
 ```
 .
-├── src/          # Core pipeline: dataset building, feature extraction,
-│                 #   nested CV, significance tests, fairness checks, edge quantization
-├── outputs/      # Generated figures, metric logs, prediction CSVs, saved models
-├── archive/      # Ad-hoc exploration and plotting scripts
-├── data/         # Git-ignored — DAIC-WOZ raw data (licence-restricted, not distributed)
+├── src/          # Core pipeline (see below)
+├── archive/      # Exploration, plotting, and ad-hoc fix scripts
+├── data/         # Git-ignored — DAIC-WOZ splits and .parquet features (licence-restricted)
+├── outputs/      # Git-ignored — generated figures, metric logs, prediction CSVs, models
 ├── requirements.txt
+├── .gitignore
 └── README.md
 ```
 
-### Key scripts in `src/`
+### `src/` — core pipeline
 
-**Data & features**
-- `build_dataset.py` — build the `.parquet` feature matrices from raw participant folders
-- `build_text_features.py` — chunk-and-pool MPNet sentence embeddings (interviewer turns removed)
+**Config & data**
+- `config.py` — paths, split files, ID/score columns, `RANDOM_STATE`
+- `features.py` — per-participant audio/visual functional extraction
+- `download_baseline.py` — fetch DAIC-WOZ participant files
+- `build_dataset.py` — build the `.parquet` feature matrices
+- `build_text_features.py` — chunk-and-pool MPNet embeddings (interviewer turns removed)
 
 **Modality evaluations (one shared protocol)**
 - `train_regression.py` — baseline: nested-CV over classical audio / visual / fusion functionals
-- `run_text_regression.py` — text: headline MPNet + Ridge model
+- `univariate_screen.py` — per-feature screening with multiple-comparison correction
+- `run_text_regression.py` — text: MPNet + Ridge headline model
+- `encoder_comparison.py` — encoder-saturation ablation (mpnet / bge / e5 / gte)
+- `interviewer_ablation.py` — interviewer-turn shortcut check
 - `run_audio_regression.py` — deep audio: 18 configs (Wav2Vec2 / WavLM × early/mid/last)
-- `run_fusion.py` — multimodal fusion (stacking / averaging / early) vs text anchor
-- `edge_fp16.py` — fp16 compression for edge deployment
+- `heldout_test_audio.py`, `audio_heldout_bootstrap.py` — audio held-out + bootstrap
+- `run_fusion.py`, `fusion_test.py` — multimodal fusion vs text anchor
+- `fusion_significance.py` — fusion-vs-text significance test
+- `edge_fp16_clean.py` — fp16 compression for edge deployment
+- `train_model.py` — train and save the frozen deployable text model
 
 **Evaluation, significance & fairness**
-- `heldout_test_both.py` — final held-out evaluation on the 47 test participants
-- `repeated_cv_significance.py` — Nadeau–Bengio corrected significance test
-- `shuffle_test.py` — label-permutation test
-- `fairness_and_bootstrap.py`, `trace_fairness.py`, `baseline_fairness_v2.py` —
-  per-group fairness, confound checks, bootstrap CIs
-- `fix_offset_leakage.py` — leakage-free fp16 offset (estimated on train+dev)
-- `make_real_figures.py` — regenerate all figures from real predictions
+- `heldout_test.py` — final held-out evaluation on the 47 test participants
+- `repeated_cv_significance_baseline.py`, `repeated_cv_comp.py` — Nadeau–Bengio significance
+- `shuffle_test.py`, `validation_test.py` — label-permutation and validation checks
+- `fairness_and_bootstrap.py`, `fairness_confound_check.py` — per-group fairness + confound
+- `baseline_fairness.py` — baseline per-group held-out fairness
+- `fusion_fairness_check.py` — fusion per-group fairness
+- `figures.py` — figure generation
+
+### `archive/` — exploration & ad-hoc scripts
+`explore.py`, `raw.py`, `trim_participants.py`, `learning_curve.py`,
+`make_learning_curve.py`, `make_real_figures.py`, `fix_figs_4_and_6.py`,
+`fix_offset_leakage.py`, `fix_offset_fast.py`, `cosine_diagnose.py`,
+`plot_text_results.py`, `severe_weighting.py`
 
 ## Data Privacy Notice
 
@@ -73,9 +88,10 @@ Requires **Python 3.10+**.
    ```bash
    pip install -r requirements.txt
    ```
-2. Obtain DAIC-WOZ access from USC ICT and place the raw `*_P` folders and split files in
-   `data/raw/`.
-3. Configure paths in `src/config.py` (`DATA_ROOT`, split files, output directory).
+2. Obtain DAIC-WOZ access from USC ICT and place the raw `*_P` folders and the split CSVs
+   (`train_split_Depression_AVEC2017.csv`, `dev_split_Depression_AVEC2017.csv`,
+   `full_test_split (1).csv`) in `data/`.
+3. Configure paths in `src/config.py`.
 4. Build the feature matrices:
    ```bash
    python3 src/build_dataset.py
@@ -87,18 +103,18 @@ Requires **Python 3.10+**.
    python3 src/run_text_regression.py    # text
    python3 src/run_audio_regression.py   # deep audio
    python3 src/run_fusion.py             # fusion
-   python3 src/edge_fp16.py              # edge
-   python3 src/heldout_test_both.py      # final held-out evaluation
+   python3 src/edge_fp16_clean.py        # edge
+   python3 src/heldout_test.py           # final held-out evaluation
    ```
 6. Regenerate figures:
    ```bash
-   python3 src/make_real_figures.py
+   python3 archive/make_real_figures.py
    ```
 
 *On Apple Silicon, prefix runs with `export PYTORCH_ENABLE_MPS_FALLBACK=1`.*
 
-All reported numbers trace to the `outputs/*_results.csv` files and the held-out runs;
-`RANDOM_STATE` is fixed in `src/config.py` for reproducibility.
+All reported numbers trace to the result CSVs and the held-out runs; `RANDOM_STATE` is fixed
+in `src/config.py` for reproducibility.
 
 ## Key Results (held-out, 47 participants)
 
@@ -115,6 +131,11 @@ All reported numbers trace to the `outputs/*_results.csv` files and the held-out
 Secondary analysis of an existing, ethically collected, licensed dataset; no new
 human-subjects data collection. The model is **research-grade, not a clinical instrument**.
 See the dissertation's ethics section for full discussion.
+
+## Citation
+
+Punj, S. (2026). *Automatic Estimation of Depression Severity from Clinical Interviews.*
+MSc dissertation, University College London.
 
 ## License
 
